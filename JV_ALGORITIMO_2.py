@@ -4,7 +4,7 @@
   "metadata": {
     "colab": {
       "provenance": [],
-      "authorship_tag": "ABX9TyM1XHUvqJSf0X1sH83T8cmp",
+      "authorship_tag": "ABX9TyOBghUaAb+cTnYlAXFBQ9Io",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -50,7 +50,7 @@
         "id": "T2i_yKl0zKu7",
         "outputId": "5b91d8d7-eb46-45de-853e-e40dc6a5a82f"
       },
-      "execution_count": 12,
+      "execution_count": null,
       "outputs": [
         {
           "output_type": "stream",
@@ -74,7 +74,7 @@
         "id": "-dHa2vw4zfCF",
         "outputId": "9bf4c470-117f-4dec-a42b-cb08a6439a41"
       },
-      "execution_count": 13,
+      "execution_count": null,
       "outputs": [
         {
           "output_type": "stream",
@@ -99,7 +99,7 @@
         "id": "JZ1oZAY4KJJx",
         "outputId": "c6f7929e-4c15-42da-d679-7f4da9e13cfd"
       },
-      "execution_count": 14,
+      "execution_count": null,
       "outputs": [
         {
           "output_type": "stream",
@@ -126,7 +126,7 @@
         "id": "UmZY5Dg0WTFb",
         "outputId": "c648e575-eeae-4cbc-ca6c-dddd2658789a"
       },
-      "execution_count": 7,
+      "execution_count": null,
       "outputs": [
         {
           "output_type": "stream",
@@ -162,7 +162,7 @@
         "id": "avhzWNnnaBN4",
         "outputId": "f49bdd99-4ee9-4888-d8ad-31abcb9ac78a"
       },
-      "execution_count": 15,
+      "execution_count": null,
       "outputs": [
         {
           "output_type": "stream",
@@ -201,7 +201,7 @@
         "id": "cx7SG0F-hsz_",
         "outputId": "516ee3b4-264e-46c8-f263-be82930dc277"
       },
-      "execution_count": 19,
+      "execution_count": null,
       "outputs": [
         {
           "output_type": "stream",
@@ -230,7 +230,7 @@
         "\n",
         "print(f\"A área do círculo é: {m:.0f}\")"
       ],
-      "execution_count": 20,
+      "execution_count": null,
       "outputs": [
         {
           "output_type": "stream",
@@ -262,7 +262,7 @@
         "print(f\"quadrado é: {quadrado}\")\n",
         "print(f\"O dobro é: {x}\")"
       ],
-      "execution_count": 21,
+      "execution_count": null,
       "outputs": [
         {
           "output_type": "stream",
@@ -281,16 +281,30 @@
         "##8. Faça um CÓDIGO que pergunte quanto você ganha por hora e o número de horas\n",
         "##trabalhadas no mês. Calcule e mostre o total do seu salário no referido mês.\n",
         "ganho= float(input(\"digite seu valor por hora\"))\n",
-        "mes=float(input(\"digite o numero de horas trabalhadas no mes\"))\n",
+        "mes=float(input(\"digite o numero de horas totais trabalhadas no mes\"))\n",
         "\n",
         "m=ganho*mes\n",
         "print(m)\n"
       ],
       "metadata": {
-        "id": "cZ4s8fCml30G"
+        "id": "cZ4s8fCml30G",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "f126b2e0-737b-419d-b8d3-5290750f5a0e"
       },
-      "execution_count": null,
-      "outputs": []
+      "execution_count": 2,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "digite seu valor por hora30\n",
+            "digite o numero de horas trabalhadas no mes44\n",
+            "1320.0\n"
+          ]
+        }
+      ]
     },
     {
       "cell_type": "code",
@@ -307,7 +321,7 @@
       "metadata": {
         "id": "8bKFqLOSl_BU"
       },
-      "execution_count": 25,
+      "execution_count": null,
       "outputs": []
     },
     {
@@ -331,7 +345,7 @@
         "id": "BtNPRyITmEgw",
         "outputId": "9e7d8bff-8dd7-4c58-ef5e-4d5cba92614c"
       },
-      "execution_count": 34,
+      "execution_count": null,
       "outputs": [
         {
           "output_type": "stream",
