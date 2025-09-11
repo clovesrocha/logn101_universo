@@ -12,3 +12,4 @@
 - José Victor 
 - Paulo Vitor
 - Laís Suzany
+- Lucas Rego Barros 
