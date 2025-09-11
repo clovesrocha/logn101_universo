@@ -4,3 +4,4 @@
 - Aughusto José;
 - Bruno Alexsandro;
 - Giovanne Henrique Araujo de Lima;
+- Vinícius Taiguara N. Santos;
