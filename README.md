@@ -2,3 +2,4 @@
 - Docente: Prof. Mentor Cloves Rocha.
 - Discentes: ...
 - Aughusto José;
+- Bruno Alexsandro;
