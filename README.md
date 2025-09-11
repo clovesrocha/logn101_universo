@@ -11,3 +11,4 @@
 - Juan pablo;
 - José Victor 
 - Paulo Vitor
+- Laís Suzany
