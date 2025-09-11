@@ -9,3 +9,4 @@
 - Brener Santana Magalhães
 - José Jackson;
 - Juan pablo;
+- José Victor 
