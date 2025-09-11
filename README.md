@@ -14,3 +14,4 @@
 - Laís Suzany
 - Lucas Rego Barros 
 - Leonardo Coelho
+- Victor Marcelo 
