@@ -3,3 +3,4 @@
 - Discentes: ...
 - Aughusto José;
 - Bruno Alexsandro;
+- Giovanne Henrique Araujo de Lima;
