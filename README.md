@@ -8,3 +8,4 @@
 - Anthony William;
 - Brener Santana Magalhães
 - José Jackson;
+- Juan pablo;
