@@ -7,3 +7,4 @@
 - Vinícius Taiguara N. Santos;
 - Anthony William;
 - Brener Santana Magalhães
+- José Jackson;
