@@ -13,3 +13,4 @@
 - Paulo Vitor
 - Laís Suzany
 - Lucas Rego Barros 
+- Leonardo Coelho
