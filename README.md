@@ -15,3 +15,4 @@
 - Lucas Rego Barros 
 - Leonardo Coelho
 - Victor Marcelo 
+- João Kleber Queiroz da Silva
