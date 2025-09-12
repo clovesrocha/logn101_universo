@@ -16,3 +16,4 @@
 - Leonardo Coelho
 - Victor Marcelo 
 - João Kleber Queiroz da Silva
+- Pedro Henrique Reis Alcantara da Silva
