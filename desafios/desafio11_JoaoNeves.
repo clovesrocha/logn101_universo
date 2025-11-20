@@ -1,0 +1,72 @@
+class Produto:
+    def __init__(self, nome: str, preco: float, em_estoque: bool):
+        self.nome = nome
+        self.preco = preco
+        self.em_estoque = em_estoque
+
+    def __repr__(self):
+        status = "Sim" if self.em_estoque else "Não"
+        return f"Produto(nome='{self.nome}', preco={self.preco}, em_estoque={status})"
+
+class ServicoFiltro:
+    @staticmethod
+    def filtrar(lista: List[T], filtro: Callable[[T], bool]) -> List[T]:
+        resultados = []
+        for item in lista:
+            if filtro(item):
+                resultados.append(item)
+        return resultados
+
+if __name__ == "__main__":
+
+    estoque = [
+        Produto("Notebook", 3500.00, True),
+        Produto("Mouse", 45.00, True),
+        Produto("Teclado", 120.00, False),
+        Produto("Monitor", 1200.00, True),
+        Produto("Cabo HDMI", 25.00, False)
+    ]
+
+    print("--- Todos os Produtos ---")
+    for p in estoque: print(p)
+
+    def filtro_apenas_estoque(p: Produto) -> bool:
+        return p.em_estoque
+
+    produtos_em_estoque = ServicoFiltro.filtrar(estoque, filtro_apenas_estoque)
+
+    print("\n--- B. Produtos em Estoque (Função Nomeada) ---")
+    for p in produtos_em_estoque: print(p)
+
+    caros = ServicoFiltro.filtrar(estoque, lambda p: p.preco > 1000.00)
+
+    print("\n--- C. Produtos Caros (> 1000) (Lambda) ---")
+    for p in caros: print(p)
+
+    bonus = ServicoFiltro.filtrar(estoque,
+        lambda p: not p.em_estoque or p.preco < 50.00
+    )
+
+    print("\n--- D. Bônus: Sem estoque OU Baratos (< 50) ---")
+    for p in bonus: print(p)
+     
+--- Todos os Produtos ---
+Produto(nome='Notebook', preco=3500.0, em_estoque=Sim)
+Produto(nome='Mouse', preco=45.0, em_estoque=Sim)
+Produto(nome='Teclado', preco=120.0, em_estoque=Não)
+Produto(nome='Monitor', preco=1200.0, em_estoque=Sim)
+Produto(nome='Cabo HDMI', preco=25.0, em_estoque=Não)
+
+--- B. Produtos em Estoque (Função Nomeada) ---
+Produto(nome='Notebook', preco=3500.0, em_estoque=Sim)
+Produto(nome='Mouse', preco=45.0, em_estoque=Sim)
+Produto(nome='Monitor', preco=1200.0, em_estoque=Sim)
+
+--- C. Produtos Caros (> 1000) (Lambda) ---
+Produto(nome='Notebook', preco=3500.0, em_estoque=Sim)
+Produto(nome='Monitor', preco=1200.0, em_estoque=Sim)
+
+--- D. Bônus: Sem estoque OU Baratos (< 50) ---
+Produto(nome='Mouse', preco=45.0, em_estoque=Sim)
+Produto(nome='Teclado', preco=120.0, em_estoque=Não)
+Produto(nome='Cabo HDMI', preco=25.0, em_estoque=Não)
