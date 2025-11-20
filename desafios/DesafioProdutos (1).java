@@ -1,13 +1,9 @@
 import java.util.ArrayList;
 import java.util.List;
 
-
- */
 public class DesafioProdutos {
 
- 
     // 1) CLASSE PRODUTO
- 
     static class Produto {
         private String nome;
         private double preco;
@@ -42,15 +38,12 @@ public class DesafioProdutos {
     }
 
     // 2) INTERFACE FUNCIONAL
-    
     @FunctionalInterface
     interface FiltroProduto<T> {
         boolean testar(T item);
     }
 
-  
-    // 3) SERVICO DE FILTRAGEM (ServicoFiltro)
-]
+    // 3) SERVIÇO DE FILTRAGEM
     static class ServicoFiltro {
         public static <T> List<T> filtrar(List<T> lista, FiltroProduto<T> filtro) {
             List<T> resultados = new ArrayList<>();
@@ -63,29 +56,21 @@ public class DesafioProdutos {
         }
     }
 
-    
-    // 4) MAIN - Testes e Demonstração (Coração do Desafio)
-    
+    // 4) MAIN
     public static void main(String[] args) {
 
-        // -------------------------
         // A) CRIAÇÃO DA LISTA
-        // -------------------------
         List<Produto> produtos = new ArrayList<>();
-        produtos.add(new Produto("Notebook Gamer", 6500.0, true));
-        produtos.add(new Produto("Mouse", 80.0, true));
-        produtos.add(new Produto("Cadeira Office", 900.0, false));
-        produtos.add(new Produto("Monitor 144Hz", 1200.0, true));
-        produtos.add(new Produto("Cabo HDMI", 35.0, false));
+        produtos.add(new Produto("PC Gamer", 6500.0, true));
+        produtos.add(new Produto("Blusa masculina", 80.0, true));
+        produtos.add(new Produto("Celular usado", 500.0, false));
+        produtos.add(new Produto("iPhone usado", 1200.0, true));
+        produtos.add(new Produto("Cabo tipo C", 35.0, false));
 
-        // Imprime a lista completa (opcional, para ver os dados originais)
         System.out.println("=== Lista Original de Produtos ===");
         produtos.forEach(System.out::println);
 
-       
         // B) FILTRO COM CLASSE ANÔNIMA
-        //    - Objetivo: produtos que estejam em estoque (emEstoque == true)
-
         List<Produto> produtosEmEstoque = ServicoFiltro.filtrar(produtos, new FiltroProduto<Produto>() {
             @Override
             public boolean testar(Produto p) {
@@ -93,29 +78,21 @@ public class DesafioProdutos {
             }
         });
 
-        System.out.println("\n=== [B] Produtos em Estoque (Classe Anônima) ===");
+        System.out.println("\n=== [B] Produtos em Estoque ===");
         produtosEmEstoque.forEach(System.out::println);
 
-      
-        // C) FILTRO COM EXPRESSÃO LAMBDA
-        
-      
-        List<Produto> produtosCaros = ServicoFiltro.filtrar(produtos, p -> p.getPreco() > 1000.0);
+        // C) FILTRO COM LAMBDA
+        List<Produto> produtosCaros = ServicoFiltro.filtrar(produtos,
+                p -> p.getPreco() > 1000.0);
 
-        System.out.println("\n=== [C] Produtos com preço > R$1000,00 (Lambda) ===");
+        System.out.println("\n=== [C] Produtos com preço > R$1000 ===");
         produtosCaros.forEach(System.out::println);
 
-
-        // D) BÔNUS: LAMBDA COM MÚLTIPLAS CONDIÇÕES
-
-
+        // D) FILTRO BÔNUS
         List<Produto> filtroBonus = ServicoFiltro.filtrar(produtos,
                 p -> (!p.isEmEstoque()) || (p.getPreco() < 50.0));
 
-        System.out.println("\n=== [D] Bônus: fora de estoque OU preço < R$50,00 (Lambda com múltiplas condições) ===");
+        System.out.println("\n=== [D] Fora de estoque OU < R$50 ===");
         filtroBonus.forEach(System.out::println);
-
-    
-   
     }
 }
