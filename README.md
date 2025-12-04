@@ -17,3 +17,4 @@
 - Victor Marcelo 
 - João Kleber Queiroz da Silva
 - Pedro Henrique Reis Alcantara da Silva
+- João Victor Viana Oliveira Silva 
