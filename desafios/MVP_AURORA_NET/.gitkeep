@@ -1,0 +1,960 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AuroraPet — Cuida, Adoção e Conexão</title>
+  <!-- Load Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Custom configuration and variables for the dark theme */
+    :root {
+      --accent-color: #00E5A8; /* Bright Teal/Cyan from original CSS */
+    }
+
+    /* Apply Inter font, dark background, and ensure full height */
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: linear-gradient(180deg, #071226 0%, #071A2A 100%);
+      color: #e6eef6;
+      min-height: 100vh;
+    }
+    
+    /* Utility classes that Tailwind doesn't easily cover, or for common components */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    .card {
+      background-color: rgba(11, 18, 32, 0.7); /* Slightly darker, glassy background */
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: background-color 0.2s;
+    }
+
+    .btn-primary {
+      background-color: var(--accent-color);
+      color: #0b1220;
+    }
+
+    .btn-primary:hover {
+      background-color: #00D095;
+    }
+
+    .btn-secondary {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: #e6eef6;
+    }
+
+    .btn-secondary:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Form styling for better consistency */
+    input[type="text"], input[type="email"], input[type="password"], textarea, select {
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #e6eef6;
+      padding: 0.5rem;
+      border-radius: 6px;
+      width: 100%;
+      margin-top: 4px;
+    }
+
+    /* Navigation */
+    .nav-link {
+      transition: color 0.2s;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+    }
+    .nav-link:hover {
+      color: var(--accent-color);
+      background-color: rgba(0, 229, 168, 0.1);
+    }
+    
+    /* Pet Card */
+    .pet-card {
+        padding: 0;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+    .pet-image {
+        height: 150px;
+        background: #081B1F;
+    }
+    .pet-meta {
+        padding: 1rem;
+    }
+    .pet-tags {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+    }
+    .tag {
+        background-color: rgba(0, 229, 168, 0.1);
+        color: var(--accent-color);
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    /* NOVA Chat */
+    .chat-window {
+        height: 300px;
+        overflow-y: auto;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        background-color: rgba(255, 255, 255, 0.03);
+    }
+    .bot-message, .user-message {
+        padding: 8px 12px;
+        border-radius: 10px;
+        margin-bottom: 8px;
+        max-width: 80%;
+    }
+    .bot-message {
+        background-color: rgba(0, 229, 168, 0.1);
+        color: var(--accent-color);
+        margin-right: auto;
+    }
+    .user-message {
+        background-color: rgba(255, 255, 255, 0.1);
+        margin-left: auto;
+        color: #e6eef6;
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .modal-overlay.open {
+        opacity: 1;
+        visibility: visible;
+    }
+    .modal-content-custom {
+        background-color: #1a202c; /* bg-gray-900 equivalent */
+        padding: 1.5rem;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 400px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        transform: translateY(-20px);
+        transition: transform 0.3s ease;
+    }
+    .modal-overlay.open .modal-content-custom {
+        transform: translateY(0);
+    }
+  </style>
+</head>
+<body class="antialiased">
+  <header class="site-header sticky top-0 z-10 bg-gray-900/90 backdrop-blur-sm shadow-lg">
+    <div class="container flex justify-between items-center py-4 header-inner">
+      <div class="flex items-center space-x-3 brand">
+        <!-- Using a placeholder image for the logo -->
+        <img src="https://placehold.co/40x40/00E5A8/0b1220?text=A" alt="AuroraPet Logo" width="40" height="40" class="rounded-full" />
+        <h1 class="text-2xl font-bold text-white">AuroraPet</h1>
+      </div>
+
+      <nav id="main-nav" class="hidden md:flex items-center space-x-4 nav">
+        <a href="#" data-route="home" class="nav-link text-gray-300">Home</a>
+        <a href="#" data-route="sobre" class="nav-link text-gray-300">Sobre</a>
+        <a href="#" data-route="adocoes" class="nav-link text-gray-300">Adoção</a>
+        <a href="#" data-route="locais" class="nav-link text-gray-300">Serviços Pet</a>
+        <a href="#" data-route="cadastro" class="nav-link text-gray-300" id="nav-cadastro">Cadastro</a>
+        <a href="#" data-route="login" class="nav-link text-gray-300" id="nav-login">Entrar</a>
+      </nav>
+
+      <div class="header-actions">
+        <button id="nova-btn" class="btn btn-primary text-sm">🤖 NOVA</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="app" class="container py-8 min-h-[60vh]">
+    <!-- Content rendered here -->
+  </main>
+
+  <!-- NOVA Chat Modal -->
+  <div id="nova-modal" class="modal-overlay hidden">
+    <div class="modal-content-custom w-full max-w-lg">
+      <div class="flex justify-between items-center pb-3 border-b border-gray-700 modal-header">
+        <h3 class="text-xl font-semibold">NOVA — Assistente AuroraPet</h3>
+        <button id="nova-close" class="text-gray-400 hover:text-white transition duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+      <div id="nova-chat" class="chat-window mt-4">
+        <div class="bot-message">Olá! Eu sou a NOVA. Como posso te ajudar hoje? 🤖</div>
+      </div>
+      <form id="nova-form" class="flex space-x-2 mt-4 nova-form">
+        <input id="nova-input" type="text" placeholder="Pergunte algo (ex.: como adotar?)" class="flex-grow" />
+        <button class="btn btn-primary text-sm" type="submit">Enviar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Custom Alert/Confirm Modal Structure (Hidden by default) -->
+  <div id="custom-modal" class="modal-overlay">
+    <div class="modal-content-custom" id="modal-content-id">
+        <h4 id="modal-title" class="text-lg font-bold mb-3">Aviso</h4>
+        <p id="modal-message" class="text-gray-300 mb-4"></p>
+        <div id="modal-actions" class="flex justify-end space-x-3">
+            <button id="modal-cancel-btn" class="btn btn-secondary text-sm hidden">Cancelar</button>
+            <button id="modal-ok-btn" class="btn btn-primary text-sm">OK</button>
+        </div>
+    </div>
+  </div>
+
+  <input type="file" id="file-picker" accept="image/*" class="hidden" />
+
+  <script>
+    /*
+        AuroraPet - single-file JS for main interactivity, storage and UI routing.
+        Uses localStorage for "DB" (users, pets, session).
+    */
+
+    /* ---------- Modal Utilities (Replaces alert() and confirm()) ---------- */
+    const customModal = document.getElementById('custom-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalMessage = document.getElementById('modal-message');
+    const modalOkBtn = document.getElementById('modal-ok-btn');
+    const modalCancelBtn = document.getElementById('modal-cancel-btn');
+    let modalCallback = null;
+
+    /**
+     * Custom alert implementation.
+     * @param {string} message The message to display.
+     */
+    function show_alert(message) {
+        modalTitle.textContent = 'Aviso';
+        modalMessage.textContent = message;
+        modalCancelBtn.classList.add('hidden');
+        modalOkBtn.textContent = 'OK';
+        modalCallback = null;
+        modalOkBtn.onclick = () => customModal.classList.remove('open');
+        customModal.classList.add('open');
+    }
+
+    /**
+     * Custom confirm implementation.
+     * @param {string} message The confirmation message.
+     * @param {function(boolean): void} callback Function to execute with true/false result.
+     */
+    function show_confirm(message, callback) {
+        modalTitle.textContent = 'Confirmação';
+        modalMessage.textContent = message;
+        modalCancelBtn.classList.remove('hidden');
+        modalOkBtn.textContent = 'Confirmar';
+
+        modalOkBtn.onclick = () => {
+            customModal.classList.remove('open');
+            callback(true);
+        };
+        modalCancelBtn.onclick = () => {
+            customModal.classList.remove('open');
+            callback(false);
+        };
+        customModal.classList.add('open');
+    }
+
+    /* ---------- Utilitários e Dados Iniciais ---------- */
+    const STORAGE_KEYS = { USERS: 'aurora_users_v1', PETS: 'aurora_pets_v1', SESSION: 'aurora_session_v1' };
+
+    function readStorage(key){ try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch(e){ return null; } }
+    function writeStorage(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+    function uid(prefix='id'){ return prefix + '_' + Math.random().toString(36).slice(2,9); }
+
+    /* Simple CNPJ validator (estrutura simples, não fiscal) */
+    function isValidCNPJ(cnpj){
+        if(!cnpj) return false;
+        const digits = cnpj.replace(/\D/g,'');
+        return digits.length === 14;
+    }
+
+    /* file -> base64 */
+    function fileToBase64(file){
+        return new Promise((res, rej)=>{
+            const fr = new FileReader();
+            fr.onload = ()=> res(fr.result);
+            fr.onerror = () => rej('erro');
+            fr.readAsDataURL(file);
+        });
+    }
+
+    /* ------------------------------------------------ */
+    /* DADOS DE EXEMPLO (PARA MVP) */
+    /* ------------------------------------------------ */
+    const INITIAL_USERS = [
+        { id: uid('user'), name: 'ONG Recanto Animal', email: 'ong@exemplo.com', password: '123', role: 'ONG', cnpj: '11222333000100', phone: '81999999999', region: 'Recife - Boa Viagem', avatar: null, createdAt: new Date().toISOString() },
+        { id: uid('user'), name: 'Dra. Pet Care', email: 'vet@exemplo.com', password: '123', role: 'Veterinário', cnpj: '44555666000100', phone: '81988888888', region: 'Recife - Centro', avatar: null, createdAt: new Date().toISOString() },
+        { id: uid('user'), name: 'Pet Shop Recife', email: 'shop@exemplo.com', password: '123', role: 'Petshop', cnpj: '77888999000100', phone: '81977777777', region: 'Recife - Olinda', avatar: null, createdAt: new Date().toISOString() },
+    ];
+    // Placeholder image that matches the theme
+    const PLACEHOLDER_IMAGE = "https://placehold.co/200x200/00E5A8/0b1220?text=PET"; 
+    
+    const INITIAL_PETS = [
+        { id: uid('pet'), ownerId: INITIAL_USERS[0].id, ownerName: INITIAL_USERS[0].name, name: 'Luna', species: 'Cão', age: '1 ano', desc: 'Dócil, adora brincar e é compatível com crianças.', image: PLACEHOLDER_IMAGE, createdAt: new Date().toISOString(), region: INITIAL_USERS[0].region, type: 'Porte Médio' },
+        { id: uid('pet'), ownerId: INITIAL_USERS[0].id, ownerName: INITIAL_USERS[0].name, name: 'Miau', species: 'Gato', age: '4 meses', desc: 'Filhote, muito carinhoso e sociável.', image: PLACEHOLDER_IMAGE, createdAt: new Date().toISOString(), type: 'Comum' },
+        { id: uid('pet'), ownerId: INITIAL_USERS[0].id, ownerName: INITIAL_USERS[0].name, name: 'Zeca', species: 'Papagaio', age: '3 anos', desc: 'Fala algumas palavras, precisa de tutor experiente.', image: PLACEHOLDER_IMAGE, createdAt: new Date().toISOString(), region: INITIAL_USERS[0].region, type: 'Exótico' },
+    ];
+
+    /* Bootstrap initial arrays if null/empty */
+    if(!readStorage(STORAGE_KEYS.USERS) || readStorage(STORAGE_KEYS.USERS).length < INITIAL_USERS.length) writeStorage(STORAGE_KEYS.USERS, INITIAL_USERS);
+    if(!readStorage(STORAGE_KEYS.PETS) || readStorage(STORAGE_KEYS.PETS).length === 0) writeStorage(STORAGE_KEYS.PETS, INITIAL_PETS);
+    /* ------------------------------------------------ */
+
+
+    /* ---------- Routing & DOM ---------- */
+    const app = document.getElementById('app');
+    const nav = document.getElementById('main-nav');
+    const novaBtn = document.getElementById('nova-btn');
+    const novaModal = document.getElementById('nova-modal');
+    const novaClose = novaModal.querySelector('#nova-close'); // Find close button inside novaModal
+    const novaForm = document.getElementById('nova-form');
+    const novaChat = document.getElementById('nova-chat');
+    const navCadastro = document.getElementById('nav-cadastro');
+    const navLogin = document.getElementById('nav-login');
+    const filePicker = document.getElementById('file-picker');
+
+    function getSessionUser(){ return readStorage(STORAGE_KEYS.SESSION); }
+    function setSessionUser(user){ writeStorage(STORAGE_KEYS.SESSION, user); }
+    function clearSession(){ localStorage.removeItem(STORAGE_KEYS.SESSION); }
+
+    /* Render - top-level */
+    function renderRoute(route){
+        // Ensure modal is closed before rendering a new route
+        customModal.classList.remove('open'); 
+        novaModal.classList.add('hidden');
+        
+        // Remove active class from all nav links
+        nav.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.remove('font-bold', 'text-teal-400');
+        });
+
+        // Add active class to the current route link
+        const currentLink = nav.querySelector([data-route="${route}"]);
+        if (currentLink) {
+            currentLink.classList.add('font-bold', 'text-teal-400');
+        }
+
+        switch(route){
+            case 'sobre': return renderSobre();
+            case 'cadastro': return renderCadastro();
+            case 'login': return renderLogin();
+            case 'profile': return renderProfile();
+            case 'adocoes': return renderAdocoes();
+            case 'locais': return renderServicosELocais();
+            default: return renderHome();
+        }
+    }
+
+    /* Update navbar based on session */
+    function updateNav(){
+        const user = getSessionUser();
+        // remove dynamic links
+        [...nav.querySelectorAll('.dynamic')].forEach(el => el.remove());
+        if(user){
+            // hide cadastro/login
+            navLogin.classList.add('hidden');
+            navCadastro.classList.add('hidden');
+            // add profile links
+            const profile = document.createElement('a'); profile.href='#'; profile.textContent='Perfil'; profile.className='nav-link text-gray-300 dynamic'; profile.dataset.route='profile';
+            const logout = document.createElement('a'); logout.href='#'; logout.textContent='Sair'; logout.className='nav-link text-gray-300 dynamic'; logout.onclick = (e) => { e.preventDefault(); clearSession(); updateNav(); renderRoute('home'); };
+            nav.appendChild(profile); nav.appendChild(logout);
+        }else{
+            navLogin.classList.remove('hidden');
+            navCadastro.classList.remove('hidden');
+        }
+    }
+
+    /* Global nav click handler (Incluindo Locais) */
+    document.addEventListener('click', (e) => {
+        const a = e.target.closest('a[data-route]');
+        if(a){ e.preventDefault(); const route=a.dataset.route; renderRoute(route); }
+    });
+
+    /* NOVA modal logic (mantida) */
+    novaBtn.addEventListener('click', ()=> novaModal.classList.remove('hidden'));
+    novaClose.addEventListener('click', ()=> novaModal.classList.add('hidden'));
+
+    novaForm.addEventListener('submit', (ev)=>{
+        ev.preventDefault();
+        const input = document.getElementById('nova-input');
+        const text = input.value.trim();
+        if(!text) return;
+        appendUserMessage(text);
+        
+        // Show loading indicator
+        const loadingMsg = document.createElement('div');
+        loadingMsg.className = 'bot-message loading';
+        loadingMsg.innerHTML = '...digitando';
+        novaChat.appendChild(loadingMsg);
+        novaChat.scrollTop = novaChat.scrollHeight;
+
+        // simple rule-based responses
+        setTimeout(()=> {
+            loadingMsg.remove();
+            const res = novaReply(text);
+            appendBotMessage(res);
+            novaChat.scrollTop = novaChat.scrollHeight;
+        }, 800);
+        input.value='';
+    });
+
+    function appendBotMessage(msg){ const d = document.createElement('div'); d.className='bot-message'; d.innerHTML = msg; novaChat.appendChild(d); }
+    function appendUserMessage(msg){ const d = document.createElement('div'); d.className='user-message'; d.textContent = msg; novaChat.appendChild(d); }
+
+    /* NOVA simple replies */
+    function novaReply(q){
+        q = q.toLowerCase();
+        if(q.includes('adotar') || q.includes('adoção')) return 'Para ver pets disponíveis, clique na aba <b>Adoção</b>. Lembre-se, apenas usuários cadastrados podem entrar em contato com os donos.';
+        if(q.includes('contato') || q.includes('whatsapp')) return 'Nosso WhatsApp: <a href="https://wa.me/5581981297964" target="_blank" class="text-teal-400 hover:text-teal-300">(+55) 81 98129-7964</a>.';
+        if(q.includes('cadastro')) return 'Você pode se cadastrar em <b>Cadastro</b>. Pessoas comuns e ONGs podem postar para adoção. Todos os cadastrados podem adotar.';
+        if(q.includes('recife') || q.includes('pernambuco')) return 'Atuamos em Recife, Pernambuco. Use a aba <b>Serviços Pet</b> para ver os locais cadastrados.';
+        if(q.includes('olá')||q.includes('oi')) return 'Oi! Eu sou a NOVA — posso ajudar com adoções, cadastro e encontrar serviços pet.';
+        return 'Legal! Ainda estou aprendendo. Sugiro você explorar a seção de <b>Adoção</b> ou <b>Serviços Pet</b>.';
+    }
+
+    /* ---------- Views ---------- */
+
+    /* Home View */
+    function renderHome(){
+        app.innerHTML = `
+        <section class="card hero grid md:grid-cols-3 gap-6 mb-8" aria-label="hero">
+            <div class="md:col-span-2 hero-left">
+                <h2 class="text-4xl font-extrabold text-white mb-3">Transforme uma vida. Adote hoje!</h2>
+                <p class="text-gray-300 text-lg">Nossa plataforma conecta você a pets incríveis em Recife, prontos para encontrar um lar.</p>
+                <div class="mt-6">
+                    <a href="#" data-route="adocoes" class="btn btn-primary text-lg">Ver Pets para Adoção</a>
+                </div>
+            </div>
+            <div class="md:col-span-1 card bg-gray-900/50 p-4 border-teal-500/30 border">
+                <div class="flex items-center space-x-2">
+                    <svg class="w-6 h-6 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    <h4 class="text-xl font-semibold text-teal-400">#DicaAuroraPet</h4>
+                </div>
+                <p class="text-gray-400 mt-2 text-sm">Estudos comprovam: ter um pet reduz o estresse e melhora a saúde do coração. Adote um novo amigo e ganhe um companheiro para a vida!</p>
+            </div>
+        </section>
+
+        <section class="grid md:grid-cols-3 gap-6 mb-8">
+            <div class="card">
+                <h3 class="text-xl font-bold text-teal-400">🐾 Top 5 Cuidados Essenciais</h3>
+                <p class="text-gray-400 mt-2 text-sm">1. Vacinação em dia. 2. Alimentação de qualidade. 3. Visitas regulares ao Veterinário. 4. Passeios e exercícios diários. 5. Muito amor e carinho!</p>
+            </div>
+
+            <div class="card">
+                <h3 class="text-xl font-bold text-teal-400">🐕 Locais e Serviços em Recife</h3>
+                <p class="text-gray-400 mt-2 text-sm">Encontre Pet Shops, Veterinários e serviços de Passeio de Pet na sua região. Tudo que você precisa para seu amigo, a um clique.</p>
+                <div class="mt-4"><a href="#" data-route="locais" class="text-teal-400 hover:underline nav-link">Ver Locais →</a></div>
+            </div>
+            
+            <div class="card">
+                <h3 class="text-xl font-bold text-teal-400">💌 Por que Adotar?</h3>
+                <p class="text-gray-400 mt-2 text-sm">Adotar um animal resgatado significa dar uma segunda chance a uma vida e combater o abandono. É um ato de amor que transforma a sua casa em um lar completo.</p>
+            </div>
+        </section>
+
+        <div>
+            <div class="card">
+                <h4 class="text-2xl font-semibold mb-4">Pets em Destaque (Últimas Publicações)</h4>
+                <div id="home-pets" class="grid md:grid-cols-3 gap-6"></div>
+                <div class="mt-4 text-right"><a href="#" data-route="adocoes" class="text-teal-400 hover:underline nav-link">Ver todas adoções →</a></div>
+            </div>
+        </div>
+        `;
+        renderHomePets();
+    }
+
+    function renderHomePets(){
+        const grid = document.getElementById('home-pets');
+        const pets = readStorage(STORAGE_KEYS.PETS) || [];
+        grid.innerHTML = '';
+        const latest = pets.slice(-3).reverse();
+        if(!latest.length) grid.innerHTML = '<div class="text-gray-500 col-span-3">Nenhum pet publicado ainda.</div>';
+        latest.forEach(p => {
+            const card = document.createElement('div'); card.className='pet-card card';
+            card.innerHTML = `<div class="pet-image rounded-t-xl overflow-hidden">
+                <img src="${p.image || PLACEHOLDER_IMAGE}" alt="${p.name}" class="w-full h-full object-cover" />
+                </div>
+                <div class="pet-meta">
+                    <h4 class="text-xl font-semibold">${p.name} <small class="text-gray-400 font-normal">(${p.species})</small></h4>
+                    <div class="pet-tags">
+                        <span class="tag">${p.age || 'idade não informada'}</span>
+                        <span class="tag">${p.type || 'desconhecido'}</span>
+                    </div>
+                    <p class="text-gray-400 mt-2 text-sm line-clamp-2">${p.desc || 'Sem descrição.'}</p>
+                </div>`;
+            grid.appendChild(card);
+        });
+    }
+
+    /* Sobre */
+    function renderSobre(){
+        app.innerHTML = `
+            <section class="card max-w-3xl mx-auto">
+                <h2 class="text-3xl font-bold mb-4">Conectando Vidas em Recife</h2>
+                <p class="text-gray-300 mb-6">O <span class="text-teal-400 font-semibold">AuroraPet</span> é um projeto MVP (Produto Mínimo Viável) dedicado a ser a principal plataforma de bem-estar animal em Recife, Pernambuco. Nossa missão é clara: <span class="font-semibold italic">facilitar a adoção responsável e conectar tutores a serviços de qualidade.</span></p>
+                
+                <h3 class="text-2xl font-semibold text-teal-400 mt-6 mb-3">🎯 Nossos Pilares:</h3>
+                <ul class="list-disc list-inside space-y-2 text-gray-300">
+                    <li><span class="font-bold">Adoção Simplificada:</span> Um feed de pets focado na região, permitindo que qualquer usuário cadastrado (Pessoa Comum, Veterinário ou Pet Shop) possa adotar. Apenas ONGs e Pessoas Comuns podem publicar pets.</li>
+                    <li><span class="font-bold">Rede de Serviços:</span> Conexão direta entre usuários e profissionais verificados (Veterinários, Petshops e Passeadores de Pets) listados em um só lugar.</li>
+                    <li><span class="font-bold">Informação e Cuidado:</span> Compartilhamento de conteúdo essencial sobre vacinação, alimentação e bem-estar animal.</li>
+                </ul>
+
+                <p class="mt-8 text-sm text-yellow-400 bg-yellow-900/30 p-3 rounded-lg border border-yellow-700/50">
+                    ℹ O site atual é um protótipo em HTML/CSS/JS puro com armazenamento local (localStorage) para demonstrar o potencial da nossa plataforma.
+                </p>
+            </section>
+        `;
+    }
+
+    /* Cadastro */
+    function renderCadastro(){
+        const roles = ['Pessoa comum','ONG','Veterinário','Petshop'];
+        app.innerHTML = `
+            <section class="card max-w-xl mx-auto">
+                <h2 class="text-3xl font-bold mb-4">Criar Conta no AuroraPet</h2>
+                <form id="form-cadastro" class="space-y-4">
+                    <div><label class="block text-sm font-medium">Nome completo</label><input required id="r-name" type="text" /></div>
+                    <div><label class="block text-sm font-medium">Email</label><input required id="r-email" type="email" /></div>
+                    <div><label class="block text-sm font-medium">Senha</label><input required id="r-password" type="password" /></div>
+                    <div>
+                        <label class="block text-sm font-medium">Tipo de conta</label>
+                        <select id="r-role">${roles.map(r=><option>${r}</option>).join('')}</select>
+                    </div>
+                    <div id="cnpj-row" class="hidden">
+                        <label class="block text-sm font-medium">CNPJ (obrigatório para ONG / Veterinário / Petshop)</label>
+                        <input id="r-cnpj" type="text" placeholder="somente números" />
+                    </div>
+                    <div><label class="block text-sm font-medium">Telefone</label><input id="r-phone" type="text" /></div>
+                    <div class="flex space-x-3 items-center pt-2">
+                        <button class="btn btn-primary" type="submit">Criar conta</button>
+                        <button id="r-cancel" class="btn btn-secondary" type="button">Cancelar</button>
+                    </div>
+                </form>
+            </section>
+        `;
+        document.getElementById('r-role').addEventListener('change', (e)=>{
+            const v = e.target.value;
+            document.getElementById('cnpj-row').classList.toggle('hidden', v === 'Pessoa comum');
+            // Ensure CNPJ is marked required for non-common roles
+            const cnpjInput = document.getElementById('r-cnpj');
+            if (v !== 'Pessoa comum') {
+                cnpjInput.setAttribute('required', 'required');
+            } else {
+                cnpjInput.removeAttribute('required');
+            }
+        });
+        document.getElementById('r-cancel').addEventListener('click', ()=> renderRoute('home'));
+        document.getElementById('form-cadastro').addEventListener('submit', handleCadastro);
+    }
+
+    function handleCadastro(e){
+        e.preventDefault();
+        const name = document.getElementById('r-name').value.trim();
+        const email = document.getElementById('r-email').value.trim().toLowerCase();
+        const password = document.getElementById('r-password').value;
+        const role = document.getElementById('r-role').value;
+        const cnpjInput = document.getElementById('r-cnpj');
+        const cnpj = cnpjInput.value.trim();
+        const phone = document.getElementById('r-phone').value.trim();
+
+        const users = readStorage(STORAGE_KEYS.USERS) || [];
+        if(users.find(u => u.email === email)){ 
+            show_alert('Já existe uma conta com esse email. Por favor, tente fazer login.'); 
+            return; 
+        }
+
+        if(role !== 'Pessoa comum' && !isValidCNPJ(cnpj)){
+            show_alert('CNPJ inválido. Para ONG, Veterinário ou Petshop é obrigatório informar o CNPJ (14 dígitos).');
+            return;
+        }
+
+        const user = { id: uid('user'), name, email, password, role, cnpj: cnpj||null, phone, region: 'Recife - Pernambuco', avatar: null, createdAt: new Date().toISOString() };
+        users.push(user);
+        writeStorage(STORAGE_KEYS.USERS, users);
+        // auto login
+        setSessionUser(user);
+        updateNav();
+        show_alert('Conta criada com sucesso! Você agora está logado.');
+        renderRoute('profile');
+    }
+
+    /* Login */
+    function renderLogin(){
+        app.innerHTML = `
+            <section class="card max-w-md mx-auto">
+                <h2 class="text-3xl font-bold mb-4">Entrar no AuroraPet</h2>
+                <form id="form-login" class="space-y-4">
+                    <div><label class="block text-sm font-medium">Email</label><input id="l-email" type="email" required /></div>
+                    <div><label class="block text-sm font-medium">Senha</label><input id="l-password" type="password" required /></div>
+                    <div class="flex space-x-3 items-center pt-2">
+                        <button class="btn btn-primary" type="submit">Entrar</button>
+                        <button id="to-cad" class="btn btn-secondary" type="button">Criar conta</button>
+                    </div>
+                    <p class="text-sm text-gray-400 mt-4">Dica: Use <code>ong@exemplo.com</code> e senha <code>123</code> para demonstração.</p>
+                </form>
+            </section>
+        `;
+        document.getElementById('to-cad').addEventListener('click', ()=> renderRoute('cadastro'));
+        document.getElementById('form-login').addEventListener('submit', (e)=>{
+            e.preventDefault();
+            const email = document.getElementById('l-email').value.trim().toLowerCase();
+            const password = document.getElementById('l-password').value;
+            const users = readStorage(STORAGE_KEYS.USERS) || [];
+            
+            const user = users.find(u => u.email === email && u.password === password);
+            if(!user){	
+                show_alert('Email ou senha incorretos. Tente novamente ou use a dica de demonstração.');	
+                return;	
+            }
+            setSessionUser(user);
+            updateNav();
+            renderRoute('profile');
+        });
+    }
+
+    /* Profile */
+    function renderProfile(){
+        const user = getSessionUser();
+        if(!user){ renderRoute('login'); return; }
+
+        // Restrição: Apenas ONG ou Pessoa comum podem postar pets
+        const isAdoptionRole = user.role === 'ONG' || user.role === 'Pessoa comum';
+        
+        // Content
+        let profileContent = `
+            <section class="card max-w-4xl mx-auto">
+                <div class="flex flex-col sm:flex-row gap-5 items-start sm:items-center">
+                    <div class="w-24 h-24 rounded-xl overflow-hidden bg-teal-800/50">
+                        <img id="profile-avatar" src="${user.avatar || 'https://placehold.co/100x100/1E293B/00E5A8?text=AVATAR'}" class="w-full h-full object-cover" alt="${user.name}" />
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-bold">${user.name}</h2>
+                        <div class="text-teal-400 font-medium mt-1">${user.role} • ${user.region}</div>
+                        <div class="text-gray-400 text-sm mt-1">Email: ${user.email} ${user.cnpj ? ' • CNPJ: ' + user.cnpj : ''}</div>
+                    </div>
+                </div>
+
+                <div class="mt-6 border-t border-gray-700 pt-6 grid md:grid-cols-2 gap-6">
+        `;
+
+        // Adoption Content (ONG, Pessoa Comum)
+        if (isAdoptionRole) {
+            profileContent += `
+                <div class="card p-4 border-teal-500/30 border">
+                    <h3 class="text-xl font-semibold mb-3 text-teal-400">Publicar pet para adoção</h3>
+                    <form id="pet-form" class="space-y-3">
+                        <div><label class="block text-sm">Nome do Pet</label><input id="p-name" type="text" required /></div>
+                        <div><label class="block text-sm">Espécie (ex.: cão, gato, papagaio)</label><input id="p-species" type="text" required /></div>
+                        <div><label class="block text-sm">Idade</label><input id="p-age" type="text" /></div>
+                        <div><label class="block text-sm">Descrição</label><textarea id="p-desc" rows="3"></textarea></div>
+                        <div class="flex space-x-2 pt-2">
+                            <button class="btn btn-primary text-sm" type="submit">Publicar pet</button>
+                            <button id="p-upload" type="button" class="btn btn-secondary text-sm">Escolher imagem</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card p-4">
+                    <h3 class="text-xl font-semibold mb-3 text-white">Suas publicações</h3>
+                    <div id="my-pets" class="space-y-4"></div>
+                </div>
+            `;
+        // Service Content (Petshop, Veterinário)
+        } else {
+            profileContent += `
+                <div class="md:col-span-2 card p-4 border-yellow-500/30 border">
+                    <h3 class="text-xl font-semibold mb-3 text-yellow-400">Gerenciamento de Serviços (Listado em Serviços Pet)</h3>
+                    <p class="text-gray-300">Como <span class="font-bold">${user.role}</span>, suas informações de contato já estão ativas e disponíveis na aba <span class="text-teal-400">Serviços Pet</span>.</p>
+                    <ul class="list-disc list-inside space-y-1 text-gray-400 mt-4">
+                        <li><span class="font-bold">Telefone:</span> ${user.phone || 'Não informado. Edite seu perfil.'}</li>
+                        <li><span class="font-bold">Região:</span> ${user.region || 'Não informado.'}</li>
+                        <li><span class="font-bold">Status:</span> <span class="text-teal-400">Conta verificada para listagem.</span></li>
+                    </ul>
+                    <p class="text-gray-500 mt-4 text-sm">O módulo de agendamento de serviços, como banho, tosa e consultas veterinárias, será desenvolvido em uma próxima fase do MVP.</p>
+                    <button class="btn btn-secondary text-sm mt-3">Configurar Serviço (Em desenvolvimento)</button>
+                </div>
+            `;
+        }
+        
+        profileContent += </div></section>;
+        app.innerHTML = profileContent;
+
+        // --- Handlers ---
+        let pendingImage = null;
+
+        if (isAdoptionRole) {
+            // Handlers para UPLOAD de imagem de PET
+            document.getElementById('p-upload').addEventListener('click', ()=> {
+                filePicker.dataset.target = 'pet';
+                filePicker.click();
+            });
+
+            document.getElementById('pet-form').addEventListener('submit', (e)=>{
+                e.preventDefault();
+                const name = document.getElementById('p-name').value.trim();
+                const species = document.getElementById('p-species').value.trim();
+                const age = document.getElementById('p-age').value.trim();
+                const desc = document.getElementById('p-desc').value.trim();
+                const pets = readStorage(STORAGE_KEYS.PETS) || [];
+                const pet = {
+                    id: uid('pet'),
+                    ownerId: user.id,
+                    ownerName: user.name,
+                    name, species, age, desc,
+                    image: pendingImage || PLACEHOLDER_IMAGE,
+                    createdAt: new Date().toISOString(),
+                    region: user.region || 'Recife - PE',
+                    type: user.role // Adiciona o tipo de conta como tag (ex: ONG, Pessoa comum)
+                };
+                pets.push(pet);
+                writeStorage(STORAGE_KEYS.PETS, pets);
+                pendingImage = null;
+                show_alert('Pet publicado com sucesso! Ele já está disponível para adoção.');
+                renderProfile(); // refresh
+            });
+
+            renderMyPets();
+        }
+
+        // Handler GLOBAL de imagem
+        filePicker.onchange = async (ev) => {
+            const f = ev.target.files[0];
+            if(!f) return;
+            const data = await fileToBase64(f);
+            
+            // Current implementation only uses it for pending pet image
+            pendingImage = data;
+            show_alert('Imagem carregada (temporária). Ela será usada ao publicar o pet.');
+            ev.target.value = '';	
+            delete ev.target.dataset.target;
+        };
+    }
+
+    /* helper to display user's pets */
+    function renderMyPets(){
+        const user = getSessionUser();
+        const pets = (readStorage(STORAGE_KEYS.PETS) || []).filter(p => p.ownerId === user.id).reverse();
+        const container = document.getElementById('my-pets');
+        if(!container) return;
+        container.innerHTML = '';
+        if(!pets.length) container.innerHTML = '<div class="text-gray-500 italic">Você ainda não publicou nenhum pet para adoção.</div>';
+        pets.forEach(p => {
+            const el = document.createElement('div'); el.className='flex items-center space-x-4 p-3 bg-gray-900 rounded-lg shadow-md';
+            el.innerHTML = `<div class="w-16 h-16 overflow-hidden rounded-md flex-shrink-0">
+                <img src="${p.image || PLACEHOLDER_IMAGE}" alt="${p.name}" class="w-full h-full object-cover" />
+            </div>
+            <div class="flex-grow">
+                <h5 class="text-lg font-semibold">${p.name} <span class="text-gray-400 text-sm">(${p.species})</span></h5>
+                <p class="text-gray-500 text-xs">${p.desc.substring(0, 50)}...</p>
+            </div>
+            <div class="flex flex-col space-y-2 flex-shrink-0">
+                <button class="btn btn-secondary !p-1 !text-xs" onclick="window.editPet('${p.id}')">Editar</button>
+                <button class="btn !bg-red-700/50 hover:!bg-red-600/50 !text-white !p-1 !text-xs" onclick="window.deletePet('${p.id}')">Excluir</button>
+            </div>`;
+            container.appendChild(el);
+        });
+    }
+
+    /* global edit/delete handlers (expostos) */
+    window.deletePet = function(id){
+        show_confirm('Tem certeza que deseja excluir esta publicação de adoção? Esta ação é irreversível.', (result) => {
+            if(result) {
+                let pets = readStorage(STORAGE_KEYS.PETS) || [];
+                pets = pets.filter(p => p.id !== id);
+                writeStorage(STORAGE_KEYS.PETS, pets);
+                show_alert('Publicação excluída com sucesso.');
+                renderRoute('profile');
+            }
+        });
+    };
+
+    window.editPet = function(id){
+        show_alert('Editar post: Funcionalidade em desenvolvimento. Você pode excluir e recadastrar se necessário.');
+    };
+
+
+    /* Adoções (feed) */
+    function renderAdocoes(filterSpecies = 'Todos'){	
+        const allPets = (readStorage(STORAGE_KEYS.PETS) || []).slice().reverse();
+        const user = getSessionUser(); 
+        const isLogged = !!user;
+
+        let petsToRender = allPets;
+        const speciesList = ['Todos', 'Cão', 'Gato', 'Outros'];
+
+        // Lógica de filtro mantida
+        if(filterSpecies !== 'Todos'){
+            petsToRender = allPets.filter(p => {
+                if (filterSpecies === 'Outros') {
+                    const speciesLower = p.species ? p.species.toLowerCase() : '';
+                    return !speciesLower.includes('cão') && !speciesLower.includes('gato');
+                }
+                return p.species && p.species.toLowerCase().includes(filterSpecies.toLowerCase());
+            });
+        }
+
+        app.innerHTML = `
+            <section class="card mb-6">
+                <h2 class="text-3xl font-bold mb-2">Adoções em Recife</h2>
+                <p class="text-gray-400">${!isLogged ? '⚠ <span class="text-yellow-400 font-semibold">Apenas usuários logados podem entrar em contato para adoção.</span>' : 'Encontre seu novo melhor amigo.'}</p>
+                
+                <div class="flex flex-wrap gap-3 mt-4">
+                    ${speciesList.map(s => <button class="btn-secondary !text-sm ${filterSpecies === s ? '!bg-teal-700/40 text-teal-300' : ''}" onclick="renderAdocoes('${s}')">${s}</button>).join('')}
+                </div>
+            </section>
+            <section class="grid md:grid-cols-3 lg:grid-cols-4 gap-6" id="pets-grid"></section>
+        `;
+        const grid = document.getElementById('pets-grid');
+        renderPetsGrid(petsToRender, grid, isLogged);
+    }
+
+    function renderPetsGrid(petsToRender, gridElement, isLogged) {
+        gridElement.innerHTML = '';
+        if(!petsToRender.length) gridElement.innerHTML = '<div class="card md:col-span-3 lg:col-span-4 text-gray-500 italic">Nenhum pet encontrado com os filtros selecionados.</div>';
+        
+        petsToRender.forEach(p => {
+            const card = document.createElement('div'); card.className='pet-card card hover:shadow-xl hover:shadow-teal-900/20';
+            
+            // Lógica do botão de contato: se não logado, o botão não funciona ou leva para o login
+            const contactButton = isLogged	
+                ? <button class="btn btn-primary text-sm w-full" onclick="window.contactOwner('${p.ownerId}')">Contato</button>
+                : <button class="btn btn-secondary text-sm w-full" onclick="renderRoute('login')">Fazer Login para Contato</button>;
+
+            card.innerHTML = `
+                <div class="pet-image rounded-t-xl overflow-hidden">
+                    <img src="${p.image || PLACEHOLDER_IMAGE}" alt="${p.name}" class="w-full h-full object-cover" />
+                </div>
+                <div class="pet-meta space-y-2">
+                    <h4 class="text-xl font-bold">${p.name}</h4>
+                    <div class="pet-tags">
+                        <span class="tag">${p.species || 'desconhecido'}</span>
+                        <span class="tag">${p.age || 'idade não informada'}</span>
+                    </div>
+                    <p class="text-gray-400 text-sm line-clamp-3">${p.desc || 'Descrição não fornecida.'}</p>
+                    <div class="text-gray-500 text-xs pt-1">Por: ${p.ownerName} - ${p.region || 'Recife'}</div>
+                    <div class="flex gap-2 pt-3">
+                        ${contactButton}
+                        <button class="btn btn-secondary text-sm flex-shrink-0" onclick="window.saveFavorite('${p.id}')">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 22l7.682-7.318a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                        </button>
+                    </div>
+                </div>`;
+            gridElement.appendChild(card);
+        });
+    }
+
+    /* Contact owner (open whatsapp) */
+    window.contactOwner = function(ownerId){
+        const user = getSessionUser();
+        if(!user){ show_alert('Você precisa estar logado para entrar em contato com o responsável pela adoção.'); return; } 
+
+        const users = readStorage(STORAGE_KEYS.USERS) || [];
+        const owner = users.find(u => u.id === ownerId);
+        if(owner && owner.phone){
+            const digits = owner.phone.replace(/\D/g,'');
+            const phone = digits.startsWith('55') ? digits : ('55'+digits);
+            const link = https://wa.me/${phone};
+            window.open(link,'_blank');
+        } else {
+            show_alert('O proprietário não informou um telefone direto. Redirecionando para o contato geral do AuroraPet.');
+            window.open('https://wa.me/5581981297964','_blank');
+        }
+    };
+
+    /* Save favorite (simple) */
+    window.saveFavorite = function(petId){
+        if(!getSessionUser()){ show_alert('Faça login para salvar um pet nos favoritos!'); return; }
+        const favKey = 'aurora_favs_v1';
+        const favs = JSON.parse(localStorage.getItem(favKey) || '[]');
+        if(favs.includes(petId)) { show_alert('Este pet já está salvo nos seus favoritos.'); return; }
+        favs.push(petId);
+        localStorage.setItem(favKey, JSON.stringify(favs));
+        show_alert('Pet salvo nos favoritos com sucesso!');
+    };
+
+    /* Serviços e Locais */
+    function renderServicosELocais(){
+        const users = readStorage(STORAGE_KEYS.USERS) || [];
+        const ongs = users.filter(u => u.role === 'ONG');
+        const vets = users.filter(u => u.role === 'Veterinário');
+        const shops = users.filter(u => u.role === 'Petshop');
+        const otherServices = users.filter(u => u.role === 'Pessoa comum' && u.phone);
+
+        // Helper function for rendering lists
+        const renderList = (list) => {
+            if(!list.length) return '<div class="text-gray-500 italic mt-2">Nenhum estabelecimento cadastrado nesta categoria.</div>';
+            return list.map(o=>`
+                <div class="p-3 bg-gray-900/50 rounded-lg">
+                    <strong class="text-teal-400">${o.name}</strong>
+                    <div class="text-gray-400 text-sm mt-1">
+                        ${o.phone ? <a href="https://wa.me/55${o.phone.replace(/\D/g,'')}" target="_blank" class="hover:underline">${o.phone}</a> : 'Telefone não informado'}
+                        • ${o.region}
+                    </div>
+                </div>
+            `).join('');
+        };
+
+        app.innerHTML = `
+            <section class="card">
+                <h2 class="text-3xl font-bold mb-2">Serviços Pet em Recife</h2>
+                <p class="text-gray-400 mb-6">Encontre profissionais e estabelecimentos verificados para cuidar do seu pet na nossa região de atuação.</p>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    
+                    <div class="card p-4 space-y-3">
+                        <h4 class="text-xl font-semibold text-teal-300">ONGs e Resgates (${ongs.length})</h4>
+                        ${renderList(ongs)}
+                    </div>
+                    
+                    <div class="card p-4 space-y-3">
+                        <h4 class="text-xl font-semibold text-teal-300">Veterinários e Clínicas (${vets.length})</h4>
+                        ${renderList(vets)}
+                    </div>
+                    
+                    <div class="card p-4 space-y-3">
+                        <h4 class="text-xl font-semibold text-teal-300">Pet Shops e Passeios (${shops.length})</h4>
+                        ${renderList(shops)}
+                    </div>
+                </div>
+            </section>
+        `;
+    }
+
+    /* initial load */
+    window.onload = function(){
+        updateNav();
+        renderRoute('home');
+    }
+  </script>
+</body>
+</html>
